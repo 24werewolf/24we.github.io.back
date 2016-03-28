@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Fedora 22上安装jekyll</title>
+    
+    <meta name="author" content="温智全">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/prettify.css" rel="stylesheet" type="text/css">
+    <script src="/assets/themes/twitter/js/prettify.js"></script>
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+<!--    font-awesome-->
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  </head>
+
+  <body onload="prettyPrint()" >
+    <div class="navbar">
+      <div class="navbar-inner">
+       <div class="nav-narrow">
+          <a class="brand" href="/"><span class="fa fa-mortar-board (alias)">wenknows's blog</span></a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">文章</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+
+
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+<!--
+<div class="page-header">
+  <h1>Fedora 22上安装jekyll <small>Supporting tagline</small></h1>
+</div>
+-->
+ 
+
+<div class="row-fluid post-full">
+  <div class="span12 ">
+    <div class="content card">
+        <div class="date_label">
+          <div class="day_month">
+          09/18
+          </div>
+          <div class="year">
+          2015
+          </div>
+        </div>
+      <h1>Fedora 22上安装jekyll</h1>
+
+<hr />
+
+<h3>1. 概述</h3>
+
+<p>jekyll是一个简单的免费的Blog生成工具，类似WordPress。但是和WordPress又有很大的不同，原因是jekyll只是一个生成静态网页的工具，不需要数据库支持。但是可以配合第三方服务,例如Disqus。最关键的是jekyll可以免费部署在Github上，而且可以绑定自己的域名。</p>
+
+<h3>2. 安装最新版ruby</h3>
+
+<p>调用命令</p>
+
+<pre><code>sudo dnf install ruby
+</code></pre>
+
+<p>安装完成后,输入命令</p>
+
+<pre><code>ruby -v
+</code></pre>
+
+<p>会有如下类似的显示:</p>
+
+<pre><code>ruby 2.2.3p173 (2015-08-18 revision 51636) [x86_64-linux]
+</code></pre>
+
+<p>说明已经成功安装了2.2.3版本的ruby。</p>
+
+<!--break-->
+
+
+<h3>3. 安装jkeyll</h3>
+
+<p>安装最新版本的jekyll，命令如下：</p>
+
+<pre><code>gem install jekyll
+</code></pre>
+
+<p>安装过程中可能会报如下错误:</p>
+
+<pre><code>Fetching: ffi-1.9.10.gem (100%)
+Building native extensions.  This could take a while...
+ERROR:  Error installing jekyll:
+    ERROR: Failed to build gem native extension.
+
+    /usr/bin/ruby -r ./siteconf20150918-17908-j7rbks.rb extconf.rb
+mkmf.rb can't find header files for ruby at /usr/share/include/ruby.h
+
+extconf failed, exit code 1
+
+Gem files will remain installed in /home/wenzhiquan/.gem/ruby/gems/ffi-1.9.10 for inspection.
+Results logged to /home/wenzhiquan/.gem/ruby/extensions/x86_64-linux/ffi-1.9.10/gem_make.out
+</code></pre>
+
+<p>原因是没有安装gem本地扩展,输入命令<code>sudo dnf install ruby-devel</code>安装dev版本的ruby即可解决问题。如果是报gcc相关的错误,只需要<code>sudo dnf install gcc</code>进行安装即可。</p>
+
+<p>因为我们将会使用Markdown语言作为标记语言，所以还需要安装rdiscount，命令如下：</p>
+
+<pre><code>gem install rdiscount
+</code></pre>
+
+<p>至此，本机的jekyll运行环境就已经搭建好了。</p>
+
+<h3>4. 运行例子</h3>
+
+<p>安装好之后，就可以自己构建一个博客系统，或者也可以到<a href="http://jekyllthemes.org/" title="jekyll 模板网站">jekyll模板网站</a> 下载自己喜欢的模板进行修改，然后运行并查看效果，要运行jekyll首先要进入博客的根目录，然后运行命令<code>jekyll server</code>，最后会显示启动信息：</p>
+
+<pre><code>Server address: http://127.0.0.1:4000/
+Server running... press ctrl-c to stop.
+</code></pre>
+
+<p>说明程序已经成功启动，在浏览器中输入localhost:4000，就可以查看自己的博客了。</p>
+
+    </div>
+
+ 
+<!--
+    <ul class="tag_box inline ">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#Fedora-ref">
+    		Fedora <span>6</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline ">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#Fedora-ref">Fedora <span>8</span></a></li>
+     
+    	<li><a href="/tags.html#jekyll-ref">jekyll <span>2</span></a></li>
+    
+  
+
+
+
+    </ul>
+    -->
+    
+    <div class="pagination clearfix">
+      <ul class = "pull-right">
+      
+        <li class="prev"><a class="fa fa-arrow-circle-left" href="/2015/05/29/install_nginx_php_mysql_phpmyadmin_on_mac_osx" title="Mac OS上搭建LNMP开发环境"> 前一篇</a></li>
+      
+        <li><a class="fa fa-th" href="/archive.html"> 所有日志</a></li>
+      
+        <li class="next"><a  href="/2016/03/28/seven_sort" title="七种排序算法">后一篇 <span class="fa fa-arrow-circle-right">  </span></a></li>
+      
+      </ul>
+    </div>
+    
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'wenzhiquan'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+
+      <footer class="card clearfix">
+        <span style="font-size:30px;"class="fa fa-github pull-left"></span><a href="https://github.com/wenzhiquan/blog" style="display:inline-block;padding-right:80px;border-right:1px solid #bbb">fork me on GitHub</a>
+        <p class="pull-right">&copy; 2014 温智全
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
+

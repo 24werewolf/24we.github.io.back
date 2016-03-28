@@ -1,0 +1,487 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Fedora 20 安装gitolite</title>
+    
+    <meta name="author" content="温智全">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/prettify.css" rel="stylesheet" type="text/css">
+    <script src="/assets/themes/twitter/js/prettify.js"></script>
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+<!--    font-awesome-->
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  </head>
+
+  <body onload="prettyPrint()" >
+    <div class="navbar">
+      <div class="navbar-inner">
+       <div class="nav-narrow">
+          <a class="brand" href="/"><span class="fa fa-mortar-board (alias)">wenknows's blog</span></a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">文章</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+
+
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+<!--
+<div class="page-header">
+  <h1>Fedora 20 安装gitolite <small>Supporting tagline</small></h1>
+</div>
+-->
+ 
+
+<div class="row-fluid post-full">
+  <div class="span12 ">
+    <div class="content card">
+        <div class="date_label">
+          <div class="day_month">
+          10/14
+          </div>
+          <div class="year">
+          2014
+          </div>
+        </div>
+      <h1>Fedora 20 安装gitolite</h1>
+
+<hr />
+
+<h3>1.gitolite安装先决条件</h3>
+
+<p>关于<code>git</code>和<code>ssh</code>登录的基础知识，网上已经有很多很好的文章，在这里就不再加以赘述了。</p>
+
+<p><strong>1.1.安装git</strong></p>
+
+<p>要安装<code>gitolite</code>，首先要安装<code>git</code>:</p>
+
+<pre><code>sudo yum install git
+</code></pre>
+
+<p><strong>1.2.创建git用户组和git用户</strong></p>
+
+<p>然后，需要新建用户和用户组<code>git</code>，以方便所有用户使用<code>git</code>账户进行登录：</p>
+
+<pre><code># 添加git用户组
+sudo groupadd git
+
+# 创建新用户git并将其添加到用户组git之中
+sudo adduser -g git git
+
+# 修改用户git的密码
+sudo passwd git
+</code></pre>
+
+<!--break-->
+
+
+<p><strong>1.3.创建管理员密钥</strong></p>
+
+<p>由于初始化<code>gitolite</code>需要一个管理员的公钥，所以需要创建一个<code>key</code>:</p>
+
+<pre><code># 为名为“yourname”的账户生成相应的key
+ssh-keygen -t rsa -C "yourname"
+
+# 选择存储key的位置及key文件名称
+Enter file in which to save the key (/home/user/.ssh/id_rsa): /home/user/.ssh/yourname
+Enter passphrase (empty for no passphrase): #为你的key创建密码，一般不需要，回车即可
+Enter same passphrase again: #回车即可
+
+# 最后输出类似的结果表示key生成成功
+...
+The key's randomart image is:
++--[ RSA 2048]----+
+|    . .          |
+|     = .         |
+|  . o E          |
+| o o = o         |
+|  o o = S        |
+|   . + B.        |
+|    . =o.        |
+|     .o.         |
+|     .oo.        |
++-----------------+
+</code></pre>
+
+<p><strong>1.4.将公钥上传到git用户中</strong></p>
+
+<p>生成<code>key</code>之后，需要将其上传到<code>git</code>用户之中：</p>
+
+<pre><code># 将公钥上传到git用户中
+scp /home/user/.ssh/yourname.pub git@localhost:/tmp
+
+ECDSA key fingerprint is 77:ad:e9:c2:e3:9f:bc:eb:38:42:e8:24:4f:b4:4a:a9.
+Are you sure you want to continue connecting (yes/no)? yes
+</code></pre>
+
+<p>若此时出现错误：</p>
+
+<pre><code>ssh: connect to host 127.0.0.1 port 22: Connection refused
+lost connection
+</code></pre>
+
+<p>则说明<code>ssh</code>服务没有打开，需要开启<code>ssh</code>服务：</p>
+
+<pre><code># 开启ssh服务
+sudo service sshd start
+
+# 开机启动ssh服务
+sudo systemctl enable sshd.service
+</code></pre>
+
+<p>除此之外，要让局域网内的用户能够访问<code>git</code>服务器，需要关闭防火墙：</p>
+
+<pre><code>sudo systemctl stop firewalld.service
+sudo systemctl disable firewalld.service
+</code></pre>
+
+<p><br/></p>
+
+<h3>2.安装gitolite</h3>
+
+<p><strong>2.1.进入git用户并创建bin目录</strong></p>
+
+<p>安装<code>gitolite</code>的操作需要在<code>git</code>用户下进行，首先需要切换到<code>git</code>用户：</p>
+
+<pre><code>su git
+</code></pre>
+
+<p>输入密码后，需要切换到<code>git</code>用户的用户根目录下创建<code>bin</code>文件夹：</p>
+
+<pre><code>cd ~
+
+# 创建bin文件夹是为了将gitolite安装到其中便于认知和管理
+mkdir bin
+</code></pre>
+
+<p><strong>2.2.克隆gitolite并安装</strong></p>
+
+<p>我们需要从<code>github</code>中克隆<code>gitolite</code>的官方仓库进行安装：</p>
+
+<pre><code># 克隆gitolite仓库
+git clone git://github.com/sitaramc/gitolite
+
+#将gitolite安装到bin目录下
+./gitolite/install -to ~/bin/
+</code></pre>
+
+<p>安装<code>gitolite</code>的时候，可能会出现错误：</p>
+
+<pre><code>Can't locate Data/Dumper.pm in @INC
+</code></pre>
+
+<p>这是由于没有安装相应的<code>perl</code>包所导致的，需要切换回非<code>git</code>用户进行安装，使用命令：</p>
+
+<pre><code># 使用CPAN安装perl包
+sudo perl -MCPAN -e shell
+
+cpan[1]&gt; install Data::Dumper
+</code></pre>
+
+<p>如果是首次使用<code>CPAN</code>会进行一定的配置，在询问是否自动配置处输入<code>yes</code>即可。</p>
+
+<p>使用<code>CPAN</code>时可能出现错误：</p>
+
+<pre><code>Can't locate CPAN.pm in @INC
+</code></pre>
+
+<p>这是由于没有安装<code>CPAN</code>出现的错误，使用命令：</p>
+
+<pre><code>sudo yum install perl-CPAN
+</code></pre>
+
+<p>安装完成后，应该会自动集成<code>Data::Dumper</code>包。</p>
+
+<p>回到<code>git</code>用户，安装<code>gitolite</code>后，<code>bin</code>文件夹中会出现相应的文件，到此，<code>gitolite</code>就安装成功了。</p>
+
+<p><strong>2.3.使用公钥初始化gitolite</strong></p>
+
+<p>完成安装<code>gitolite</code>后，需要使用刚才上传的公钥将<code>gitolite</code>进行初始化，这个公钥的所有者将成为<code>gitolite</code>的第一个管理员, 在<code>git</code>用户根目录下，使用命令：</p>
+
+<pre><code># 使用yourname.pub对gitolite进行初始化
+./bin/gitolite setup -pk yourname.pub
+
+初始化空的 Git 版本库于 /home/git/repositories/gitolite-admin.git/
+初始化空的 Git 版本库于 /home/git/repositories/testing.git/
+WARNING: /home/git/.ssh missing; creating a new one
+    (this is normal on a brand new install)
+WARNING: /home/git/.ssh/authorized_keys missing; creating a new one
+    (this is normal on a brand new install)
+</code></pre>
+
+<p>到此为止，<code>gitolite</code>的初始化已经完成。</p>
+
+<p><br/></p>
+
+<h3>3.添加gitolite的用户和仓库</h3>
+
+<p>不要手动在<code>git</code>服务器中添加新用户或者新仓库。因为<code>gitolite</code>的用户，仓库和权限规则都是使用一个名为<code>gitolite-admin</code>的特殊仓库进行维护的，想要进行修改，就需要通过修改该仓库的文件并<code>push</code>到服务器当中。</p>
+
+<p>要添加用户和仓库，首先需要退出<code>git</code>用户后，将<code>gitolite-admin</code>克隆到本地:</p>
+
+<pre><code># 退出git用户
+exit
+
+# 将gitolite-admin仓库克隆到本地
+git clone git@localhost:gitolite-admin
+</code></pre>
+
+<p>进入<code>gtiolite</code>目录后，可以看到两个子目录<code>conf</code>和<code>keydir</code>，<code>conf/gitolite.conf</code>用于修改仓库，用户及其权限，<code>keydir</code>用于存放用户的公钥。</p>
+
+<p>为了增加新用户<code>alice</code>，<code>bob</code>和<code>carol</code>， 首先需要获取他们的公钥（alice.pub，bob.pub和carol.pub），并添加到<code>keydir</code>文件夹当中。</p>
+
+<p>为了增加新仓库<code>foo</code>，并赋予这些用户不同的权限，修改<code>conf/gitolite.conf</code>文件：</p>
+
+<pre><code>repo foo
+    RW+         =   alice
+    RW          =   bob
+    R           =   carol
+</code></pre>
+
+<p>进行修改之后，需要将改动上传到服务器使其生效：</p>
+
+<pre><code>git add conf
+git add keydir
+git commit -m "added foo, gave access to alice, bob, carol"
+git push
+</code></pre>
+
+<p>当<code>git</code>的<code>push</code>操作成功后，<code>gitolite</code>将会把新用户添加到服务器的<code>~/.ssh/authorized_keys</code>文件中，然后会新建一个名为<code>foo</code>的空仓库。</p>
+
+<p><br/></p>
+
+<h3>4.进阶操作</h3>
+
+<p><strong>4.1.权限管理</strong></p>
+
+<p><code>gitolite</code>的权限管理非常强大，之前展示的只是最简单的权限管理，下面是更加深入一些的管理：</p>
+
+<pre><code>repo foo
+    RW+                     =   alice
+    -   master              =   bob
+    -   refs/tags/v[0-9]    =   bob
+    RW                      =   bob
+    RW  refs/tags/v[0-9]    =   carol
+    R                       =   dave
+</code></pre>
+
+<p>下面对上述规则进行阐述：</p>
+
+<ul>
+<li><p><code>alice</code>能够对仓库进行所有的操作。</p></li>
+<li><p><code>bob</code>能够创建和推送任何名字不为<code>master</code>的分支，并能够添加任何不以<code>v+数字</code>开头的<code>tag</code>。</p></li>
+<li><p><code>carol</code>能够添加任何以<code>v+数字</code>开头的<code>tag</code>。</p></li>
+<li><p><code>dave</code>能够进行<code>clone</code>和<code>fetch</code>操作。</p></li>
+</ul>
+
+
+<p>更加详细的权限管理请看<a href="http://gitolite.com/gitolite/gitolite.html" title="gitolite官方文档">官方文档</a>。</p>
+
+<p><strong>4.2.组</strong></p>
+
+<p><code>gitolite</code>允许创建用户组：</p>
+
+<pre><code>@staff      =   alice bob carol
+@interns    =   ashok
+
+repo secret
+    RW      =   @staff
+
+repo foss
+    RW+     =   @staff
+    RW      =   @interns
+</code></pre>
+
+<p>用户组是可以堆叠的，下面的写法和上方的<code>@staff</code>是相同的：</p>
+
+<pre><code>@staff      =   alice bob
+@staff      =   carol
+</code></pre>
+
+<p>同样的，也可以将用户组添加到另一个用户组当中：</p>
+
+<pre><code>@all-devs   =   @staff @interns
+</code></pre>
+
+<p>此外，<code>gitolite</code>有一个特殊的用户组，名为<code>@all</code>，他表示所有的用户。</p>
+
+    </div>
+
+ 
+<!--
+    <ul class="tag_box inline ">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#Fedora-ref">
+    		Fedora <span>6</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline ">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#Fedora-ref">Fedora <span>8</span></a></li>
+     
+    	<li><a href="/tags.html#gitolite-ref">gitolite <span>1</span></a></li>
+    
+  
+
+
+
+    </ul>
+    -->
+    
+    <div class="pagination clearfix">
+      <ul class = "pull-right">
+      
+        <li class="prev"><a class="fa fa-arrow-circle-left" href="/2014/10/11/fedora_20_install_qq_2013" title="Fedora 20 安装qq2013"> 前一篇</a></li>
+      
+        <li><a class="fa fa-th" href="/archive.html"> 所有日志</a></li>
+      
+        <li class="next"><a  href="/2014/10/14/markdown_simple_syntax" title="Markdown 简明语法">后一篇 <span class="fa fa-arrow-circle-right">  </span></a></li>
+      
+      </ul>
+    </div>
+    
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'wenzhiquan'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+
+      <footer class="card clearfix">
+        <span style="font-size:30px;"class="fa fa-github pull-left"></span><a href="https://github.com/wenzhiquan/blog" style="display:inline-block;padding-right:80px;border-right:1px solid #bbb">fork me on GitHub</a>
+        <p class="pull-right">&copy; 2014 温智全
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
+

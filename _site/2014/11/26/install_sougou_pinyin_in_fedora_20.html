@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>fedora20 安装搜狗输入法</title>
+    
+    <meta name="author" content="温智全">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/prettify.css" rel="stylesheet" type="text/css">
+    <script src="/assets/themes/twitter/js/prettify.js"></script>
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+<!--    font-awesome-->
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  </head>
+
+  <body onload="prettyPrint()" >
+    <div class="navbar">
+      <div class="navbar-inner">
+       <div class="nav-narrow">
+          <a class="brand" href="/"><span class="fa fa-mortar-board (alias)">wenknows's blog</span></a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">文章</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+
+
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+<!--
+<div class="page-header">
+  <h1>fedora20 安装搜狗输入法 <small>Supporting tagline</small></h1>
+</div>
+-->
+ 
+
+<div class="row-fluid post-full">
+  <div class="span12 ">
+    <div class="content card">
+        <div class="date_label">
+          <div class="day_month">
+          11/26
+          </div>
+          <div class="year">
+          2014
+          </div>
+        </div>
+      <h1>fedora20 安装搜狗输入法</h1>
+
+<hr />
+
+<h3>0.环境描述</h3>
+
+<pre><code>系统环境: Fedora 20  64位
+搜狗输入法版本: sogou_pinyin_linux_1.1.0.0037_amd64
+</code></pre>
+
+<h3>1.卸载ibus</h3>
+
+<pre><code>sudo yum remove ibus
+gsettings set org.gnome.settings-daemon.plugins.keyboard active false    #解除gnome桌面与ibus守护进程的绑定(必须有这一步)
+</code></pre>
+
+<h3>2.安装fcitx输入法</h3>
+
+<p> linux 搜狗输入法使用fcitx作为输入平台,因此要先安装fcitx输入法:</p>
+
+<pre><code>sudo yum install fcitx fcitx-configtool
+</code></pre>
+
+<p>检查安装结果:</p>
+
+<pre><code>fcitx -v
+显示:fcitx version: 4.2.8.4
+</code></pre>
+
+<p>说明fcitx的当前版本为4.2.8.4,安装成功</p>
+
+<!--break-->
+
+
+<p>下一步需要配置Fcitx的环境:在~/.bashrc中加入一下内容:</p>
+
+<pre><code>export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS="@im=fcitx"
+</code></pre>
+
+<p>保存后重启电脑</p>
+
+<h3>3.安装搜狗拼音输入法</h3>
+
+<p>到<a href="http://pinyin.sogou.com/linux/" title="搜狗输入法官网">官网</a>下载最新版本的搜狗拼音输入法,我下载的是<code>sogou_pinyin_linux_1.1.0.0037_amd64.deb</code></p>
+
+<p>下载完成后,切换到deb包所在的目录,执行以下命令:</p>
+
+<pre><code>ar vx sogou_pinyin_linux_1.1.0.0037_amd64.deb
+</code></pre>
+
+<p>此时会获取包中的文件:</p>
+
+<pre><code>x - debian-binary
+x - control.tar.gz
+x - data.tar.xz
+</code></pre>
+
+<p>然后执行以下命令,将包中的内容配置到系统安装目录当中:</p>
+
+<pre><code>sudo tar -Jxvf data.tar.xz  -C /
+</code></pre>
+
+<p>,在fcitx中导入搜狗库,使fcitx识别并统一管理搜狗拼音,执行以下命令:</p>
+
+<pre><code>sudo cp /usr/lib/x86_64-linux-gnu/fcitx/fcitx-sogoupinyin.so  /usr/lib64/fcitx/fcitx-sogoupinyin.so
+</code></pre>
+
+<h3>4.启动搜狗拼音输入法</h3>
+
+<p>打开终端,启动fcitx和搜狗拼音输入法:</p>
+
+<pre><code>fcitx
+sogou-qimpanel
+</code></pre>
+
+<p>为了避免每次启动都要自己手动输入此命令,可以将搜狗拼音输入法加入开机启动项之中</p>
+
+    </div>
+
+ 
+<!--
+    <ul class="tag_box inline ">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#fedora-ref">
+    		fedora <span>2</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline ">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#Fedora-ref">Fedora <span>8</span></a></li>
+    
+  
+
+
+
+    </ul>
+    -->
+    
+    <div class="pagination clearfix">
+      <ul class = "pull-right">
+      
+        <li class="prev"><a class="fa fa-arrow-circle-left" href="/2014/11/25/leetcode_medium_single_number" title="leetcode medium single number"> 前一篇</a></li>
+      
+        <li><a class="fa fa-th" href="/archive.html"> 所有日志</a></li>
+      
+        <li class="next"><a  href="/2014/12/09/nginx_mysql_php_in_fedora" title="fedora20 配置Nginx，Mysql，PHP">后一篇 <span class="fa fa-arrow-circle-right">  </span></a></li>
+      
+      </ul>
+    </div>
+    
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'wenzhiquan'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+
+      <footer class="card clearfix">
+        <span style="font-size:30px;"class="fa fa-github pull-left"></span><a href="https://github.com/wenzhiquan/blog" style="display:inline-block;padding-right:80px;border-right:1px solid #bbb">fork me on GitHub</a>
+        <p class="pull-right">&copy; 2014 温智全
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
+

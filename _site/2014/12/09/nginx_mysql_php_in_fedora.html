@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>fedora20 配置Nginx，Mysql，PHP</title>
+    
+    <meta name="author" content="温智全">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/prettify.css" rel="stylesheet" type="text/css">
+    <script src="/assets/themes/twitter/js/prettify.js"></script>
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+<!--    font-awesome-->
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  </head>
+
+  <body onload="prettyPrint()" >
+    <div class="navbar">
+      <div class="navbar-inner">
+       <div class="nav-narrow">
+          <a class="brand" href="/"><span class="fa fa-mortar-board (alias)">wenknows's blog</span></a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">文章</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+
+
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+<!--
+<div class="page-header">
+  <h1>fedora20 配置Nginx，Mysql，PHP <small>Supporting tagline</small></h1>
+</div>
+-->
+ 
+
+<div class="row-fluid post-full">
+  <div class="span12 ">
+    <div class="content card">
+        <div class="date_label">
+          <div class="day_month">
+          12/09
+          </div>
+          <div class="year">
+          2014
+          </div>
+        </div>
+      <h1>fedora22 配置Nginx,Mysql,PHP</h1>
+
+<hr />
+
+<h3>1. 安装nginx</h3>
+
+<p>nginx在fedora当中是一个默认包，所以直接使用命令行进行安装即可：</p>
+
+<pre><code>sudo dnf install nginx -y
+</code></pre>
+
+<p>然后启动nginx服务：</p>
+
+<pre><code>sudo service nginx start
+</code></pre>
+
+<p>当然，也可以设置他为开机启动：</p>
+
+<pre><code>sudo systemctl enable nginx.service
+</code></pre>
+
+<!--break-->
+
+
+<p>然后在你的浏览器当中输入localhost，如果看到以下界面即为安装成功：</p>
+
+<p><img src="/image/nginx_sccess.png" title="nginx success" alt="nginx success" /></p>
+
+<h3>2. 安装MySQL</h3>
+
+<p>mysql在fedora当中叫做MariaDB，但是也可以用安装mysql的命令直接进行安装：</p>
+
+<pre><code>sudo dnf install mysql mysql-server -y
+</code></pre>
+
+<p>然后启动mysql服务：</p>
+
+<pre><code>sudo service mariadb start
+</code></pre>
+
+<p>当然，也可以设置他为开机启动：</p>
+
+<pre><code>sudo systemctl enable mariadb.service
+</code></pre>
+
+<p>然后输入命令：</p>
+
+<pre><code>sudo netstat -tap | grep mysql
+</code></pre>
+
+<p>如果出现以下代码，说明启动成功：</p>
+
+<pre><code>tcp        0      0 0.0.0.0:mysql           0.0.0.0:*               LISTEN
+ 5464/mysqld
+</code></pre>
+
+<p>启动成功后，我们需要给root用户设置一个密码，以防止任何人都可以访问我们的数据库：</p>
+
+<pre><code>mysqladmin -u root password "root"
+</code></pre>
+
+<h3>3. 安装PHP</h3>
+
+<p>我们可以让PHP5在nginx中以FastCGI的模式工作。</p>
+
+<pre><code>sudo dnf install php lighttpd-fastcgi php-devel php-fpm php-mysql -y
+</code></pre>
+
+<p>然后启动php-fpm服务：</p>
+
+<pre><code>sudo service php-fpm start
+</code></pre>
+
+<p>当然，也可以设置他为开机启动：</p>
+
+<pre><code>sudo systemctl enable php-fpm.service
+</code></pre>
+
+<p>启动之后，还需要配置nginx使之支持php</p>
+
+<h3>4. 配置nginx支持php</h3>
+
+<p>首先备份原先的conf文件</p>
+
+<pre><code>mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+</code></pre>
+
+<p>然后复制一份配置文件</p>
+
+<pre><code>cp /etc/nginx/nginx.conf.default /etc/nginx/nginx.conf
+</code></pre>
+
+<p>新建两个目录用于分别存放可用和生效的配置文件</p>
+
+<pre><code>mkdir -p /etc/nginx/sites-avaliable
+mkdir -p /etc/nginx/sites-enabled
+</code></pre>
+
+<p>这两个目录是模仿Ubuntu的nginx目录进行创建的，其中sites-analiable文件夹用于存放所有可用的server配置，sites-enabled文件夹用于存放生效的server配置</p>
+
+<p>修改nginx配置文件，添加fastcgi支持</p>
+
+<pre><code> vim /etc/nginx/nginx.conf
+</code></pre>
+
+<p>将文件修改为以下内容：</p>
+
+<pre><code># For more information on configuration, see:
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
+
+user  nginx;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log;
+#error_log  /var/log/nginx/error.log  notice;
+#error_log  /var/log/nginx/error.log  info;
+
+pid        /run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}
+</code></pre>
+
+<p>文件将从conf.d和sites-enabled文件夹中读取所有的server配置，首先需要在sites-avaliable文件夹中建立可用的server配置，然后软链接到sites-enabled文件夹中，这样就可以修改可用配置时，生效配置也会修改，但是删除生效配置时不会对可用配置造成影响：</p>
+
+<pre><code>vim /etc/nginx/sites-avaliable/default
+</code></pre>
+
+<p>将其修改为以下内容：</p>
+
+<pre><code>#
+# The default server
+#
+server {
+    listen       80;
+    server_name  localhost; # or other domain name you like.
+    #include /data/www/.htaccess;
+    charset utf-8;
+
+    #access_log  logs/host.access.log  main;
+
+    root /usr/share/nginx/html;//这里是web项目文件夹的根目录
+
+    include /etc/nginx/default.d/*.conf;//这个配置文件是安装php和php-fpm时自动生成的，是对nginx针对php的配置
+
+   location / {
+        #try_files $uri $uri/ /index.php?$args;
+    }
+
+    error_page  404              /404.html;
+    location = /404.html {
+    }
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+    }
+}
+</code></pre>
+
+<p>然后在sites-enabled文件夹中建立可用配置的软链接即可
+<code>
+ln -s /etc/nginx/sites-avaliable/default /etc/nginx/sites-enabled/
+</code></p>
+
+<p>具体的其他nginx相关配置可以详见<a href="http://nginx.org/en/docs/">nginx官方网站</a></p>
+
+<p>另外，如果php报与时区相关的错误，则需要修改/etc/php.ini文件，在其中<code>[Date]</code>标签下加入一行<code>date.timezone = 'Asia/Shanghai'</code>即可</p>
+
+<h3>5. 测试</h3>
+
+<p>每次配置nginx文件后，都需要将其进行重启：</p>
+
+<pre><code>sudo service nginx restart
+</code></pre>
+
+<p>每次配置php.ini文件后，也需要将其进行重启：</p>
+
+<pre><code>sudo service php-fpm restart
+</code></pre>
+
+<p>然后建立index.php文件进行测试：</p>
+
+<pre><code>vim /usr/share/nginx/html/info.php
+
+&lt;?php
+   phpinfo();
+?&gt;
+</code></pre>
+
+<p>然后在浏览器中输入servername进行测试：</p>
+
+<pre><code>输入：localhost/info.php
+显示phpinfo界面说明解析成功
+</code></pre>
+
+    </div>
+
+ 
+<!--
+    <ul class="tag_box inline ">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#fedora-ref">
+    		fedora <span>2</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline ">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#Fedora-ref">Fedora <span>8</span></a></li>
+     
+    	<li><a href="/tags.html#PHP-ref">PHP <span>2</span></a></li>
+    
+  
+
+
+
+    </ul>
+    -->
+    
+    <div class="pagination clearfix">
+      <ul class = "pull-right">
+      
+        <li class="prev"><a class="fa fa-arrow-circle-left" href="/2014/11/26/install_sougou_pinyin_in_fedora_20" title="fedora20 安装搜狗输入法"> 前一篇</a></li>
+      
+        <li><a class="fa fa-th" href="/archive.html"> 所有日志</a></li>
+      
+        <li class="next"><a  href="/2015/03/19/mac_os_yosemite_install_jekyll" title="Mac OS Yosemite 安装jekyll">后一篇 <span class="fa fa-arrow-circle-right">  </span></a></li>
+      
+      </ul>
+    </div>
+    
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'wenzhiquan'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+
+      <footer class="card clearfix">
+        <span style="font-size:30px;"class="fa fa-github pull-left"></span><a href="https://github.com/wenzhiquan/blog" style="display:inline-block;padding-right:80px;border-right:1px solid #bbb">fork me on GitHub</a>
+        <p class="pull-right">&copy; 2014 温智全
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
+
